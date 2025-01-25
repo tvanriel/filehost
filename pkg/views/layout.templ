@@ -125,7 +125,7 @@ templ Layout() {
                   fetch("/sign", signOpts).
                     then(res => res.json()).
                     then(a => {
-                      fileLink.value = a.fileUrl;
+                      fileLink.value = encodeURI(a.fileUrl);
                       return fetch(a.presignedUrl, uploadOpts)}).
                     then(res => res.text()).
                     then(() => {
