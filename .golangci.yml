@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+linters:
+  enable-all: true
+  disable:
+    - exhaustruct
+    - revive
+linters-settings:
+  errcheck:
+    exclude-functions:
+      - io/ioutil.ReadFile
+      - io.Copy(*bytes.Buffer)
+      - io.Copy(os.Stdout)
+      - (*bytes.Buffer).Write
+      - (*bytes.Buffer).WriteString
+      - (*go.uber.org/zap/buffer.Buffer).Write
+      - (*go.uber.org/zap/buffer.Buffer).WriteString
+      - (*go.uber.org/zap/buffer.Buffer).WriteByte
+  depguard:
+    rules:
+      main:
+        allow:
+          - "$gostd"
+          - "go.uber.org/zap"
+          - "go.uber.org/fx"
+          - "github.com/tvanriel/cloudsdk"
+          - "github.com/tvanriel/filehost"
+          - "github.com/google/uuid"
+          - "github.com/minio/minio-go/v7"
+          - "github.com/labstack/echo/v4"
+          - "github.com/spf13/cobra"
+        
+

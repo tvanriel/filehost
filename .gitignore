@@ -1,0 +1,3 @@
+.kube
+tmp
+pkg/views/*_templ.go

@@ -1,0 +1,148 @@
+package views
+
+// Thanks to ChatGPT for generating this.
+templ Layout() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>Filehost</title>
+			<style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
+        }
+        #dropzone {
+            width: 80%;
+            max-width: 500px;
+            height: 200px;
+            border: 2px dashed #007bff;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #007bff;
+            background-color: #ffffff;
+            cursor: pointer;
+        }
+        #dropzone.dragover {
+            background-color: #e6f7ff;
+        }
+        #loading {
+            display: none;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+        #link-container {
+            display: none;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+        button {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .success {
+            background-color: #009f4b;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .success:hover {
+            background-color: #007f4b;
+        }
+    </style>
+		</head>
+		<body>
+			<div id="dropzone">Drop your file here</div>
+			<div id="loading">
+				<p>Uploading...</p>
+				<progress></progress>
+			</div>
+			<div id="link-container">
+				<p>File hosted at:</p>
+				<input type="text" id="file-link" readonly/>
+				<button id="copy-button">Copy</button>
+			</div>
+			<script>
+        const dropzone = document.getElementById('dropzone');
+        const loading = document.getElementById('loading');
+        const linkContainer = document.getElementById('link-container');
+        const fileLink = document.getElementById('file-link');
+        const copyButton = document.getElementById('copy-button');
+
+        // Highlight dropzone on dragover
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        // Remove highlight on dragleave
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        // Handle file drop
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+
+            dropzone.classList.remove('dragover');
+
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                dropzone.style.display = 'none';
+                loading.style.display = 'block';
+
+                // Simulate AJAX file upload
+
+                (async () => {
+                  const signOpts = {
+                    "method":"POST",
+                    "headers": {
+                      "Content-Type": "application/json",
+                    },
+                    "body": JSON.stringify({"filename": file.name}),
+                  }
+                  const uploadOpts = {
+                    "method":"PUT",
+                    "body": file,
+                  }
+
+                  fetch("/sign", signOpts).
+                    then(res => res.json()).
+                    then(a => {
+                      fileLink.value = a.fileUrl;
+                      return fetch(a.presignedUrl, uploadOpts)}).
+                    then(res => res.text()).
+                    then(() => {
+                      loading.style.display = 'none';
+                      linkContainer.style.display = 'block';
+                    })
+                 })()
+            }
+        });
+
+        // Copy link to clipboard
+        copyButton.addEventListener('click', () => {
+            fileLink.select();
+            document.execCommand('copy');
+            copyButton.classList.add("success")
+        });
+    </script>
+		</body>
+	</html>
+}
